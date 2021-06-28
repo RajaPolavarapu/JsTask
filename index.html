@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <title>JavaScript App</title>
+    <style>
+        .container {
+            padding: 20px;
+            font-size: 20px;
+        }
+
+        input[type='text'] {
+            padding: 12px 20px;
+            margin: 8px 0;
+            display: inline-block;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 12px 20px;
+            margin: 8px 0;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        li {
+            margin-left: 2px;
+            width: 300px;
+            text-align: left;
+            display: grid;
+            grid-auto-columns: 2fr 1fr 1fr;
+            grid-auto-flow: column;
+        }
+        .link {
+            cursor: pointer;
+            padding-left: 20px;
+            color: royalblue;
+            text-decoration: underline;
+        }
+        .completed {
+            text-decoration: line-through;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <form onsubmit="submitForm(event)">
+            <input type="text" value="" name="text" id="text" placeholder="Please Input Here" />
+            <button type="submit">Add</button>
+        </form>
+        <div id="lists"></div>
+    </div>
+
+</body>
+<script>
+    var tasks = [];
+    function submitForm(e) {
+        e.preventDefault();
+        let value = document.getElementById("text").value
+        if (value) {
+            tasks.push({
+                name: value,
+                id: tasks.length + 1,
+                status: "listed"
+            });
+            updateTasks(tasks);
+            document.getElementById("text").value = "";
+        } else return null;
+    }
+
+    function updateTask(data, type) {
+        if (type === "delete") {
+            tasks = tasks.filter(d => d.id !== data.id)
+        } else if (type === "complete") {
+            tasks = tasks.map(d => {
+                if (d.id === data.id) {
+                    return {
+                        ...d,
+                        status: "completed"
+                    }
+                } else return d
+            })
+        }
+
+        updateTasks(tasks);
+    }
+
+    function generateChild(item) {
+        const li = document.createElement('li')
+        li.textContent = item.name;
+        if (item.status === "completed") {
+            li.setAttribute("class", "completed")
+        }
+
+        const span1 = document.createElement('span');
+        span1.setAttribute("class", "link")
+        span1.textContent = "Delete"
+        span1.addEventListener('click', () => updateTask(item, "delete"));
+
+        const span2 = document.createElement('span');
+        span2.setAttribute("class", "link")
+        span2.textContent = "Completed"
+        span2.addEventListener('click', () => updateTask(item, "complete"));
+
+        li.appendChild(span1);
+        li.appendChild(span2);
+        return li;
+    }
+
+    function updateTasks(tasks) {
+        var domElement = document.querySelector("#lists");
+        while (domElement.lastElementChild) {
+            domElement.removeChild(domElement.lastElementChild);
+        }
+        tasks.map((d) => {
+            domElement.appendChild(generateChild(d));
+        })
+    }
+</script>
+
+</html>
